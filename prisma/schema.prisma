@@ -1,0 +1,46 @@
+// Prisma スキーマ — Investment Agent（Phase 1）
+// 要件定義書 requirements.md に準拠
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────
+// ポートフォリオ（1銘柄 = 1レコード）
+// ─────────────────────────────────────────
+model Portfolio {
+  id        String   @id @default(uuid())
+  ticker    String   // 例: "IBM", "1306.T", "VOO"
+  shares    Float    // 保有株数
+  avgCost   Float    // 平均取得単価
+  category  String   // "ESPP", "GENERAL", "NISA", "IDECO"
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────
+// 月次計画（給与・支出 → 投資余力）
+// ─────────────────────────────────────────
+model MonthlyPlan {
+  id             String   @id @default(uuid())
+  yearMonth      String   @unique // 例: "2026-09"
+  salary         Float    // 給与収入
+  livingExpenses Float    // 生活費
+  otherExpenses  Float    // その他支出
+  investmentCap  Float    // 投資余力（salary - livingExpenses - otherExpenses）
+  note           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Phase 2 以降で追加予定:
+// - AlertRule（アラートルール）
+// - RiskProfile（リスクプロファイル）
+// Phase 3 以降で追加予定:
+// - NewsDigest, AIRecommendation, HumanDecision, Trade, etc.
